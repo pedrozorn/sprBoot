@@ -1,0 +1,57 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/azure-sql-edge
+    user: root
+    container_name: # コンテナの状態を確認
+docker ps -a
+
+# sqlcmd コンテナを起動
+docker start sqlcmd
+
+# sqlcmd コンテナに入る
+docker exec -it sqlcmd /bin/bash
+
+# SQL Server に接続
+/opt/mssql-tools/bin/sqlcmd -S sqlserver_anv -U sa -P Audrey123!
+
+# データベースの一覧を確認
+SELECT name FROM sys.databases;
+GO
+    hostname: sqlserver_anv
+    command: "/opt/mssql/bin/sqlservr"
+    environment:
+      ACCEPT_EULA: Y
+      MSSQL_SA_PASSWORD: Audrey123!
+      MSSQL_AGENT_ENABLED: "true"
+      MSSQL_LCID: 1041
+      MSSQL_COLLATION: Japanese_CI_AS
+      TZ: 'Asia/Tokyo'
+    ports:
+      - 1533:1533
+    networks:
+      - anv-spring-core
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${MSSQL_SA_PASSWORD} -Q 'SELECT 1'"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  sqlcmd:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: "sqlcmd"
+    environment:
+      ACCEPT_EULA: Y
+      MSSQL_HOST_NAME: sqlserver_anv
+      MSSQL_SA_PASSWORD: Audrey123!
+      TZ: 'Asia/Tokyo'
+    depends_on:
+      - sqlserver
+    networks:
+      - anv-spring-core
+
+
+networks:
+  anv-spring-core:
+    driver: bridge
