@@ -13,7 +13,7 @@ services:
       MSSQL_COLLATION: Japanese_CI_AS
       TZ: 'Asia/Tokyo'
     ports:
-      - 1433:1433
+      - 1533:1533
     networks:
       - anv-spring-core
     healthcheck:
