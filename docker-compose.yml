@@ -2,21 +2,7 @@ services:
   sqlserver:
     image: mcr.microsoft.com/azure-sql-edge
     user: root
-    container_name: # コンテナの状態を確認
-docker ps -a
-
-# sqlcmd コンテナを起動
-docker start sqlcmd
-
-# sqlcmd コンテナに入る
-docker exec -it sqlcmd /bin/bash
-
-# SQL Server に接続
-/opt/mssql-tools/bin/sqlcmd -S sqlserver_anv -U sa -P Audrey123!
-
-# データベースの一覧を確認
-SELECT name FROM sys.databases;
-GO
+    container_name: sqlserver_anv
     hostname: sqlserver_anv
     command: "/opt/mssql/bin/sqlservr"
     environment:
@@ -27,7 +13,7 @@ GO
       MSSQL_COLLATION: Japanese_CI_AS
       TZ: 'Asia/Tokyo'
     ports:
-      - 1533:1533
+      - 1433:1433
     networks:
       - anv-spring-core
     healthcheck:
@@ -50,7 +36,6 @@ GO
       - sqlserver
     networks:
       - anv-spring-core
-
 
 networks:
   anv-spring-core:
